@@ -48,11 +48,11 @@
   },
   "homepage": "https://github.com/feathers-plus/seeder-foreign-keys#readme",
   "dependencies": {
-    "casual": "^1.5.19",
     "chance": "^1.0.16",
     "debug": "^3.1.0",
     "faker": "^4.1.0",
     "json-schema-faker": "^0.5.0-rc15",
+    "mongodb": "^3.1.1",
     "seeder-foreign-keys": "0.0.1"
   },
   "devDependencies": {

@@ -8,51 +8,6 @@ const faker = require('faker');
 const Chance = require('chance');
 const chance = new Chance();
 
-/*
-const jsonSchemas = {
-  bookmarksSchema : {
-    "type": "object",
-    "properties": {
-      "bookmarks": {
-        "type": "array",
-        "minItems": 3,
-        "maxItems": 5,
-        "items": {
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "number",
-              "unique": true,
-              "minimum": 1
-            },
-            "url": {
-              "type": "string",
-              "faker": "internet.url"
-            },
-            "title": {
-              "type": "string"
-            },
-            "tags": {
-              "type": "string",
-              "faker":"custom.tags"
-            },
-            "usersId": {
-              "type": "string",
-              "faker": { 'fk': 'users:random' }
-            },
-            "createdAt": {
-              "type": "integer",
-              "faker": { 'exp': 'new Date.now()' }
-            }
-          },
-          "required": ["id", "url", "title", "tags"]
-        }
-      }
-    },
-    "required": ["bookmarks"]
-  }
-};
-*/
 const jsonSchemas1 = {
   bookmarks: {
     "properties": {
@@ -87,7 +42,7 @@ const jsonSchemas1 = {
 
 const jsonSchemas2 = {
   posts: {
-    fakeItems: 3,
+    fakeRecords: 3,
     properties: {
       sentence3: {
         type: 'string',
@@ -107,7 +62,7 @@ const jsonSchemas2 = {
 
 const jsonSchemas3 = {
   users: {
-    fakeItems: 3,
+    fakeRecords: 3,
     properties: {
       id: {
         type: 'integer',
@@ -121,12 +76,12 @@ const jsonSchemas3 = {
     },
   },
   posts: {
-    fakeItems: 4,
+    fakeRecords: 4,
     properties: {
       id: {
         type: 'integer',
         unique: true,
-        minimum: 10
+        minimum: 1
       },
       title: {
         type: 'string',
@@ -145,10 +100,42 @@ const jsonSchemas3 = {
   }
 };
 
+const jsonSchemas4 = {
+  users: {
+    fakeRecords: 3,
+    properties: {
+      name: {
+        type: 'string',
+        faker: { fake: '{{name.lastName}}, {{name.firstName}}' }
+      }
+    },
+  },
+  posts: {
+    fakeRecords: 4,
+    properties: {
+      title: {
+        type: 'string',
+        faker: 'lorem.sentence',
+        maxLength: 25,
+      },
+      userId: {
+        type: 'integer',
+        faker: { 'fk': 'users:random' }
+      },
+      createdAt: {
+        type: 'integer',
+        faker: { 'exp': 'Date.now()' }
+      },
+    },
+  }
+};
+
 const jssOptions = {
-  schema: {
+  // testNoKeyConvert: true,   // Do not convert keys. Used in tests.
+  jsf: {
     alwaysFakeOptionals: true, // Populate optionals
     resolveJsonPath: true,     // See https://github.com/dchester/jsonpath
+
   },
   faker: {
     locale: 'en',              // Language
@@ -163,7 +150,7 @@ const jssOptions = {
   chance: {
     // Custom seeders
     user: () => ({
-      // This instance of 'chance' does not have the same seed as json-schema-seeder's instance.
+      // This instance of 'chance' would not have the same seed as json-schema-seeder's instance.
       first: chance.first(),
       last: chance.last(),
       email: chance.email()
@@ -171,8 +158,9 @@ const jssOptions = {
   },
 };
 
-describe('1.test.js - xxx', () => {
+describe('seeder.test.js - xxx', () => {
   it('test faker', () => {
+    jssOptions.testNoKeyConvert = true;
     const seeder = jsonSchemaSeeder(jssOptions);
 
     const data = seeder(jsonSchemas1);
@@ -186,6 +174,7 @@ describe('1.test.js - xxx', () => {
   });
 
   it('test chance', () => {
+    jssOptions.testNoKeyConvert = true;
     const seeder = jsonSchemaSeeder(jssOptions);
 
     const data = seeder(jsonSchemas2);
@@ -198,7 +187,8 @@ describe('1.test.js - xxx', () => {
     });
   });
 
-  it('multiple schemas', () => {
+  it('test seeder-foreign-keys', () => {
+    jssOptions.testNoKeyConvert = true;
     const seeder = jsonSchemaSeeder(jssOptions);
 
     const startTime = Date.now();
@@ -220,6 +210,48 @@ describe('1.test.js - xxx', () => {
       assert.isAtLeast(row.createdAt, startTime, 'createdAt start posts');
       assert.isAtMost(row.createdAt, endTime, 'createdAt end posts');
     });
+  });
+
+  it('mongodb & mongoose adapters', () => {
+    jssOptions.testNoKeyConvert = false;
+    const seeder = jsonSchemaSeeder(jssOptions);
+
+    const data = seeder(jsonSchemas4, 'mongoose');
+    const keys = data.users.map(user => user.id || user._id);
+
+    assert.deepEqual(Object.keys(data), ['users', 'posts'], 'services');
+    assert.lengthOf(data.users, 3, 'length users');
+    assert.lengthOf(data.posts, 4, 'length posts');
+
+    data.users.forEach(row => {
+      assert.deepEqual(Object.keys(row), ['name', '_id'], 'fields users');
+    });
+
+    data.posts.forEach(row => {
+      assert.deepEqual(Object.keys(row), ['title', 'userId', 'createdAt', '_id'], 'fields posts');
+      assert.include(keys, row.userId, 'userId posts');
+    });
+  });
+
+  it('sequelize & knex adapters', () => {
+    jssOptions.testNoKeyConvert = false;
+    const seeder = jsonSchemaSeeder(jssOptions);
+
+    const data = seeder(jsonSchemas4, {
+      users: 'knex',
+      posts: 'sequelize',
+    });
+    const keys = data.users.map(user => user.id || user._id);
+
+    assert.deepEqual(Object.keys(data), ['users', 'posts'], 'services');
+    assert.lengthOf(data.users, 3, 'length users');
+    assert.lengthOf(data.posts, 4, 'length posts');
+
+    data.users.forEach(row => {
+      assert.deepEqual(Object.keys(row), ['name', 'id'], 'fields users');
+      assert.include(keys, row.userId, 'userId posts');
+    });
+
   });
 });
 
