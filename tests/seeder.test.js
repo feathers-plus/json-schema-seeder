@@ -120,7 +120,7 @@ const jsonSchemas4 = {
       },
       userId: {
         type: 'integer',
-        faker: { 'fk': 'users:random' }
+        faker: { 'fk': 'users1:random' }
       },
       createdAt: {
         type: 'integer',
