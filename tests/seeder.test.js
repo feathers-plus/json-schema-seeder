@@ -8,35 +8,63 @@ const faker = require('faker');
 const Chance = require('chance');
 const chance = new Chance();
 
-const jsonSchemas1 = {
+const jsonSchemas0 = {
   bookmarks: {
-    "properties": {
-      "id": {
-        "type": "number",
-        "unique": true,
-        "minimum": 1
+    'properties': {
+      'id': {
+        'type': 'integer',
+        'unique': true,
+        'minimum': 1
       },
-      "url": {
-        "type": "string",
-        "faker": "internet.url"
+      'url': {
+        'type': 'string'
       },
-      "title": {
-        "type": "string"
+      'title': {
+        'type': 'string'
       },
-      "tags": {
-        "type": "string",
-        "faker":"custom.tags"
+      'tags': {
+        'type': 'string'
       },
-      "usersId": {
-        "type": "string",
-        "faker": { 'fk': 'bookmarks:random' }
+      userId: {
+        type: 'ID'
       },
-      "createdAt": {
-        "type": "integer",
-        "faker": { 'exp': 'Date.now()' }
+      'createdAt': {
+        'type': 'integer'
       }
     },
-    "required": ["id", "url", "title", "tags"]
+    'required': ['id', 'url', 'title', 'tags']
+  }
+};
+
+const jsonSchemas1 = {
+  bookmarks: {
+    'properties': {
+      'id': {
+        'type': 'integer',
+        'unique': true,
+        'minimum': 1
+      },
+      'url': {
+        'type': 'string',
+        'faker': 'internet.url'
+      },
+      'title': {
+        'type': 'string'
+      },
+      'tags': {
+        'type': 'string',
+        'faker': 'custom.tags'
+      },
+      'usersId': {
+        'type': 'string',
+        'faker': { 'fk': 'bookmarks:random' }
+      },
+      'createdAt': {
+        'type': 'integer',
+        'faker': { 'exp': 'Date.now()' }
+      }
+    },
+    'required': ['id', 'url', 'title', 'tags']
   }
 };
 
@@ -46,18 +74,18 @@ const jsonSchemas2 = {
     properties: {
       sentence3: {
         type: 'string',
-        chance: { sentence: [{ words: 3 }]},
+        chance: { sentence: [{ words: 3 }] }
       },
       user: {
         type: 'object',
-        chance: 'user',
+        chance: 'user'
       },
       password: {
         type: 'string',
-        chance: { hash: [{ length: 60 }] },
-      },
-    },
-  },
+        chance: { hash: [{ length: 60 }] }
+      }
+    }
+  }
 };
 
 const jsonSchemas3 = {
@@ -73,7 +101,7 @@ const jsonSchemas3 = {
         type: 'string',
         faker: { fake: '{{name.lastName}}, {{name.firstName}}' }
       }
-    },
+    }
   },
   posts: {
     fakeRecords: 4,
@@ -86,7 +114,7 @@ const jsonSchemas3 = {
       title: {
         type: 'string',
         faker: 'lorem.sentence',
-        maxLength: 25,
+        maxLength: 25
       },
       userId: {
         type: 'integer',
@@ -95,8 +123,8 @@ const jsonSchemas3 = {
       createdAt: {
         type: 'integer',
         faker: { 'exp': 'Date.now()' }
-      },
-    },
+      }
+    }
   }
 };
 
@@ -108,7 +136,7 @@ const jsonSchemas4 = {
         type: 'string',
         faker: { fake: '{{name.lastName}}, {{name.firstName}}' }
       }
-    },
+    }
   },
   posts: {
     fakeRecords: 4,
@@ -116,17 +144,17 @@ const jsonSchemas4 = {
       title: {
         type: 'string',
         faker: 'lorem.sentence',
-        maxLength: 25,
+        maxLength: 25
       },
       userId: {
         type: 'integer',
-        faker: { 'fk': 'users1:random' }
+        faker: { 'fk': 'users:random' }
       },
       createdAt: {
         type: 'integer',
         faker: { 'exp': 'Date.now()' }
-      },
-    },
+      }
+    }
   }
 };
 
@@ -134,18 +162,18 @@ const jssOptions = {
   // testNoKeyConvert: true,   // Do not convert keys. Used in tests.
   jsf: {
     alwaysFakeOptionals: true, // Populate optionals
-    resolveJsonPath: true,     // See https://github.com/dchester/jsonpath
+    resolveJsonPath: true // See https://github.com/dchester/jsonpath
 
   },
   faker: {
-    locale: 'en',              // Language
-    localeFallback: 'en',      // Language for missing fakers
+    locale: 'en', // Language
+    localeFallback: 'en', // Language for missing fakers
     // Custom seeders
     custom: {
-      tags: () => `${faker.lorem.word()}, ${faker.lorem.word()}, ${faker.lorem.word()}`,
+      tags: () => `${faker.lorem.word()}, ${faker.lorem.word()}, ${faker.lorem.word()}`
     },
-    fk: str =>  `->${str}`,
-    exp: str => `=>${str}`,
+    fk: str => `->${str}`,
+    exp: str => `=>${str}`
   },
   chance: {
     // Custom seeders
@@ -155,10 +183,24 @@ const jssOptions = {
       last: chance.last(),
       email: chance.email()
     })
-  },
+  }
 };
 
 describe('seeder.test.js - xxx', () => {
+  it('test schema with no faking', () => {
+    jssOptions.testNoKeyConvert = true;
+    const seeder = jsonSchemaSeeder(jssOptions);
+
+    const data = seeder(jsonSchemas0);
+
+    assert.deepEqual(Object.keys(data), ['bookmarks'], 'bookmarks');
+    assert.lengthOf(data.bookmarks, 5, 'length');
+
+    data.bookmarks.forEach(row => {
+      assert.deepEqual(Object.keys(row), ['id', 'url', 'title', 'tags', 'createdAt'], 'fields');
+    });
+  });
+
   it('test faker', () => {
     jssOptions.testNoKeyConvert = true;
     const seeder = jsonSchemaSeeder(jssOptions);
@@ -239,8 +281,9 @@ describe('seeder.test.js - xxx', () => {
 
     const data = seeder(jsonSchemas4, {
       users: 'knex',
-      posts: 'sequelize',
+      posts: 'sequelize'
     });
+
     const keys = data.users.map(user => user.id || user._id);
 
     assert.deepEqual(Object.keys(data), ['users', 'posts'], 'services');
@@ -249,13 +292,16 @@ describe('seeder.test.js - xxx', () => {
 
     data.users.forEach(row => {
       assert.deepEqual(Object.keys(row), ['name', 'id'], 'fields users');
-      assert.include(keys, row.userId, 'userId posts');
     });
 
+    data.posts.forEach(row => {
+      assert.deepEqual(Object.keys(row), ['title', 'userId', 'createdAt', 'id'], 'fields posts');
+      assert.include(keys, row.userId, 'userId posts');
+    });
   });
 });
 
-function inspector(desc, obj) {
+function inspector (desc, obj) { // eslint-disable-line
   if (desc) console.log(desc);
   console.log(inspect(obj, { colors: true, depth: 5 }));
 }
