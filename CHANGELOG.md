@@ -1,5 +1,12 @@
 # Change Log
 
+## [v0.1.6](https://github.com/feathers-plus/json-schema-seeder/tree/v0.1.6) (2018-10-06)
+[Full Changelog](https://github.com/feathers-plus/json-schema-seeder/compare/v0.1.5...v0.1.6)
+
+**Merged pull requests:**
+
+- Update package.json [\#1](https://github.com/feathers-plus/json-schema-seeder/pull/1) ([criticalmaas](https://github.com/criticalmaas))
+
 ## [v0.1.5](https://github.com/feathers-plus/json-schema-seeder/tree/v0.1.5) (2018-10-06)
 [Full Changelog](https://github.com/feathers-plus/json-schema-seeder/compare/v0.1.4...v0.1.5)
 
