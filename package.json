@@ -53,7 +53,8 @@
     "faker": "^4.1.0",
     "json-schema-faker": "0.5.0-rc15",
     "mongodb": "^3.1.1",
-    "seeder-foreign-keys": "^0.0.1"
+    "seeder-foreign-keys": "^0.0.1",
+    "traverse": "^0.6.6"
   },
   "devDependencies": {
     "chai": "^4.1.2",
