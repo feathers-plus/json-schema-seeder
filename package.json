@@ -1,6 +1,6 @@
 {
   "name": "json-schema-seeder",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "Seed tables from JSON-schema. Supports foreign keys, expressions, and faker, chance & casual libraries.",
   "main": "lib/",
   "directories": {
