@@ -1,5 +1,8 @@
 # Change Log
 
+## [v0.1.10](https://github.com/feathers-plus/json-schema-seeder/tree/v0.1.10) (2018-11-18)
+[Full Changelog](https://github.com/feathers-plus/json-schema-seeder/compare/v0.1.9...v0.1.10)
+
 ## [v0.1.9](https://github.com/feathers-plus/json-schema-seeder/tree/v0.1.9) (2018-10-10)
 [Full Changelog](https://github.com/feathers-plus/json-schema-seeder/compare/v0.1.8...v0.1.9)
 
